@@ -9,14 +9,18 @@ let currentAgeFilter = 'all';
 
 // טעינת האפליקציה
 $(document).ready(function() {
-    console.log('DOM ready - starting initialization');
+    console.log('אפליקצייה זאת נבנתה ע"י איתי חתואל');
+    console.log('ליצירת קשר: https://dev.etai.co.il');
+    console.log('כתובת אתר זה: https://kidsfood.etai.co.il');
+    console.log('טעינת האפליקציה...');
+
     loadRecipes();
     loadNutritionData();
     initializeEventListeners();
     showBackToTop();
     $('.emergency-recipe-display').hide();
     $('.category').addClass('collapsed');
-    console.log('Initialization complete');
+    console.log('הפעלת האפליקציה הושלמה בהצלחה');
 });
 
 // טעינת המתכונים מקובץ JSON
@@ -54,8 +58,6 @@ async function loadRecipes() {
         });
         
         filteredRecipes = [...allRecipes];
-        console.log('סך המתכונים שנטענו:', allRecipes.length);
-        console.log('דוגמא לכמה ID של מתכונים:', allRecipes.slice(0, 5).map(r => `${r.name}: ${r.id}`));
         
         // בדיקת ID כפולים
         const ids = allRecipes.map(r => r.id);
@@ -99,7 +101,6 @@ async function loadNutritionData() {
 // הצגת הערכים התזונתיים - רשימת מרכיבים
 function displayNutritionData() {
     const ingredientsList = $('#ingredients-list');
-    console.log('displayNutritionData נקרא:', !!ingredientsList.length);
     
     if (!ingredientsList.length) {
         console.warn('לא נמצא אלמנט ingredients-list');
@@ -123,7 +124,6 @@ function displayNutritionData() {
         });
     });
 
-    console.log('מרכיבים בשימוש במתכונים:', usedIngredients.size);
 
     // הוספת כל המרכיבים מה-JSON
     Object.keys(nutritionData.nutritional_values).forEach(key => {
@@ -132,7 +132,6 @@ function displayNutritionData() {
         ingredientsList.append(ingredientCard);
     });
 
-    console.log('ערכים תזונתיים הוצגו בהצלחה');
 }
 
 // יצירת כרטיס מרכיב
@@ -493,7 +492,7 @@ function performRecipeSearch() {
 
 // הצגת המתכונים
 function displayRecipes() {
-    console.log('displayRecipes called with', filteredRecipes.length, 'recipes');
+    console.log('מספר המתכונים המוצגים:', filteredRecipes.length);
     
     // ניקוי כל הקטגוריות
     $('.recipes-grid').empty();
@@ -549,11 +548,9 @@ function createRecipeCard(recipe) {
         recipe.id = `unknown_${Math.random().toString(36).substr(2, 9)}`;
     }
     
-    console.log('יוצר כרטיס מתכון:', recipe.name, 'עם ID:', recipe.id);
     
     // חישוב ערכים תזונתיים למתכון
     const nutrition = calculateRecipeNutrition(recipe);
-    console.log(`מתכון "${recipe.name}": כיסוי ${nutrition.coverage}%, קלוריות: ${nutrition.calories}, חלבון: ${nutrition.protein}g`);
     const nutritionDisplay = nutrition.coverage > 20 ? 
         `<div class="recipe-nutrition">
             🔥 ${nutrition.calories} קלוריות | 💪 ${nutrition.protein}g חלבון
@@ -693,9 +690,7 @@ function initializeEventListeners() {
     // לחיצה על כרטיס מתכון
     $(document).on('click', '.recipe-card', function() {
         const recipeId = $(this).data('recipe-id');
-        console.log('לחיצה על מתכון עם ID:', recipeId);
         const recipe = allRecipes.find(r => r.id === recipeId);
-        console.log('מתכון שנמצא:', recipe ? recipe.name : 'לא נמצא');
         if (recipe) {
             showRecipeModal(recipe);
         } else {
@@ -752,9 +747,7 @@ function initializeEventListeners() {
     // לחיצה על "צפה במתכון המלא" במתכון חירום
     $(document).on('click', '.view-full-recipe', function() {
         const recipeId = $(this).data('recipe-id');
-        console.log('לחיצה על צפה במתכון המלא עם ID:', recipeId);
         const recipe = allRecipes.find(r => r.id === recipeId);
-        console.log('מתכון חירום שנמצא:', recipe ? recipe.name : 'לא נמצא');
         if (recipe) {
             showRecipeModal(recipe);
         } else {
@@ -1010,7 +1003,6 @@ function initializeEmergencyRecipes() {
     if (emergencyRecipes.length > 0) {
         updateEmergencyCounter();
         displayEmergencyRecipe(0);
-        console.log('מתכוני חירום אותחלו:', emergencyRecipes.length, 'מתכונים');
     }
 }
 
