@@ -35,21 +35,43 @@ async function loadRecipes() {
             'ויטמינים_ומינרלים', 'דגנים_מלאים_ובריאותיים'
         ];
         
+        let globalRecipeIndex = 0; // מונה גלובלי למתכונים
+        
         categoryOrder.forEach(categoryKey => {
             if (recipesData.categories[categoryKey]) {
                 const category = recipesData.categories[categoryKey];
-                category.recipes.forEach(recipe => {
+                category.recipes.forEach((recipe, index) => {
+                    // יצירת ID ייחודי לכל מתכון
+                    recipe.id = `recipe_${globalRecipeIndex}`;
                     recipe.categoryKey = categoryKey;
                     recipe.categoryName = category.name;
+                    recipe.originalIndex = index; // שמירת האינדקס המקורי
+                    recipe.categoryIndex = index; // שמירת האינדקס בקטגוריה
                     allRecipes.push(recipe);
+                    globalRecipeIndex++;
                 });
             }
         });
         
         filteredRecipes = [...allRecipes];
+        console.log('סך המתכונים שנטענו:', allRecipes.length);
+        console.log('דוגמא לכמה ID של מתכונים:', allRecipes.slice(0, 5).map(r => `${r.name}: ${r.id}`));
+        
+        // בדיקת ID כפולים
+        const ids = allRecipes.map(r => r.id);
+        const uniqueIds = [...new Set(ids)];
+        if (ids.length !== uniqueIds.length) {
+            console.error('נמצאו ID כפולים! יש', ids.length - uniqueIds.length, 'כפילויות');
+        } else {
+            console.log('✅ כל ה-ID ייחודיים');
+        }
+        
         displayRecipes();
         updateStats();
         initializeEmergencyRecipes();
+        
+        // הוספת מספר המתכונים לכותרות הקטגוריות
+        showAmountOfRecipesFromCategory();
         
     } catch (error) {
         console.error('שגיאה בטעינת המתכונים:', error);
@@ -197,8 +219,9 @@ function showIngredientDetails(ingredient, key) {
 function cleanIngredientName(ingredientName) {
     return ingredientName
         .replace(/\d+/g, '') // הסרת מספרים
-        .replace(/גרם|כף|כוס|יחידה|יחידות/g, '') // הסרת יחידות מידה
+        .replace(/גרם|כף|כוס|יחידה|יחידות|מ"ל|ליטר|ק"ג|גרמים|כפות|כוסות/gi, '') // הסרת יחידות מידה
         .replace(/\s+/g, ' ') // החלפת רווחים כפולים ברווח יחיד
+        .replace(/[()]/g, '') // הסרת סוגריים
         .trim()
         .toLowerCase();
 }
@@ -219,19 +242,43 @@ function findNutritionByName(ingredientName) {
         }
     }
     
+    // חיפוש חלקי - אם המרכיב מכיל מילה מהמרכיב בבסיס הנתונים
+    for (let key in nutritionData.nutritional_values) {
+        const nutrition = nutritionData.nutritional_values[key];
+        if (nutrition && nutrition.name) {
+            const nutritionWords = nutrition.name.toLowerCase().split(/\s+/);
+            const ingredientWords = normalizedName.split(/\s+/);
+            
+            // בדיקה אם יש התאמה של מילה
+            for (let nutritionWord of nutritionWords) {
+                for (let ingredientWord of ingredientWords) {
+                    if (nutritionWord.length > 2 && ingredientWord.length > 2 && 
+                        (nutritionWord.includes(ingredientWord) || ingredientWord.includes(nutritionWord))) {
+                        return nutrition;
+                    }
+                }
+            }
+        }
+    }
+    
     // חיפוש במילות מפתח נוספות
     const keywordMap = {
         'ביצה': 'ביצה',
         'ביצים': 'ביצה',
         'חלב': 'חלב',
+        'חלב שקדים': 'חלב_שקדים',
+        'חלב קוקוס': 'חלב_קוקוס', 
         'לחם': 'לחם_מלא',
         'לחם מלא': 'לחם_מלא',
         'לחם לבן': 'לחם_לבן',
         'שיבולת שועל': 'שיבולת_שועל',
         'שיבולת': 'שיבולת_שועל',
         'בננה': 'בננה',
+        'בננות': 'בננה',
         'תפוח': 'תפוח',
+        'תפוחים': 'תפוח',
         'יוגורט': 'יוגורט',
+        'יוגורטים': 'יוגורט',
         'גבינה': 'גבינת_קוטג',
         'גבינת קוטג': 'גבינת_קוטג',
         'גבינה צהובה': 'גבינה_צהובה',
@@ -245,10 +292,40 @@ function findNutritionByName(ingredientName) {
         'חלה': 'חלה',
         'חמאה': 'חמאה',
         'עגבניות': 'עגבניות_שרי',
+        'עגבניה': 'עגבניות_שרי',
         'מלפפון': 'מלפפון',
+        'מלפפונים': 'מלפפון',
         'גזר': 'גזר',
+        'גזרים': 'גזר',
         'בטטה': 'בטטה',
-        'קינמון': 'קינמון'
+        'קינמון': 'קינמון',
+        'קינואה': 'קינואה',
+        'כוסמין': 'כוסמין',
+        'טף': 'טף',
+        'אגוזי מלך': 'אגוזי_מלך',
+        'זרעי צ\'יא': 'זרעי_ציה',
+        'זרעי ציא': 'זרעי_ציה',
+        'תותים': 'תותים',
+        'תותי שדה': 'תותים',
+        'אוכמניות': 'אוכמניות',
+        'מנגו': 'מנגו',
+        'אקאי': 'אקאי',
+        'ברוקולי': 'ברוקולי',
+        'כרוב נא': 'כרוב_נא',
+        'פטריות': 'פטריות',
+        'כמון': 'כמון',
+        'כורכום': 'כורכום',
+        'זנגוויל': 'זנגוויל',
+        'טחינה': 'טחינה',
+        'גרנולה': 'גרנולה',
+        'אמרנט': 'אמרנט',
+        'זרעי דלעת': 'זרעי_דלעת',
+        'שמן זית': 'שמן_זית',
+        'שמן': 'שמן_זית',
+        'דגנים': 'שיבולת_שועל',
+        'דגן': 'שיבולת_שועל',
+        'קטניות': 'עדשים',
+        'עדשים': 'עדשים'
     };
     
     for (let keyword in keywordMap) {
@@ -293,8 +370,8 @@ function calculateRecipeNutrition(recipe) {
             totalFat += (nutrition.fat || 0) * weight;
             foundIngredients++;
         } else {
-            // מרכיב לא נמצא - אפשר להוסיף לוג לדיבוג
-            console.log(`מרכיב לא נמצא: ${ingredient}`);
+            // מרכיב לא נמצא - הוספת לוג לדיבוג
+            console.log(`מרכיב לא נמצא: "${ingredient}" (לאחר ניקוי: "${cleanIngredientName(ingredient)}")`);
         }
     });
     
@@ -466,9 +543,18 @@ function createRecipeCard(recipe) {
     const seasonIcon = getSeasonIcon(recipe.season);
     const difficultyClass = getDifficultyClass(recipe.difficulty);
     
+    // וידוא שיש למתכון ID
+    if (!recipe.id) {
+        console.error('מתכון ללא ID:', recipe.name);
+        recipe.id = `unknown_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    console.log('יוצר כרטיס מתכון:', recipe.name, 'עם ID:', recipe.id);
+    
     // חישוב ערכים תזונתיים למתכון
     const nutrition = calculateRecipeNutrition(recipe);
-    const nutritionDisplay = nutrition.coverage > 50 ? 
+    console.log(`מתכון "${recipe.name}": כיסוי ${nutrition.coverage}%, קלוריות: ${nutrition.calories}, חלבון: ${nutrition.protein}g`);
+    const nutritionDisplay = nutrition.coverage > 20 ? 
         `<div class="recipe-nutrition">
             🔥 ${nutrition.calories} קלוריות | 💪 ${nutrition.protein}g חלבון
         </div>` : '';
@@ -489,6 +575,26 @@ function createRecipeCard(recipe) {
             <div class="recipe-difficulty ${difficultyClass}">${recipe.difficulty}</div>
         </div>
     `);
+}
+
+function showAmountOfRecipesFromCategory() {
+    // הוספת מספר המתכונים בכותרת כל הקטגוריות
+    $('.category').each(function() {
+        const categoryKey = $(this).data('category');
+        const categoryData = recipesData.categories[categoryKey];
+        if (categoryData) {
+            const recipeCount = categoryData.recipes.length;
+            const header = $(this).find('.category-header h2');
+            const currentText = header.text();
+            
+            // בדיקה אם המספר כבר קיים בכותרת (למנוע כפילות)
+            if (!currentText.includes('מתכונים') || !currentText.match(/\d+\s+מתכונים/)) {
+                // הסרת מספר קיים אם יש כזה
+                const cleanText = currentText.replace(/\s*-\s*\d+\s+מתכונים/, '');
+                header.text(`${cleanText} - ${recipeCount} מתכונים`);
+            }
+        }
+    });
 }
 
 // קבלת אייקון עונה
@@ -587,9 +693,14 @@ function initializeEventListeners() {
     // לחיצה על כרטיס מתכון
     $(document).on('click', '.recipe-card', function() {
         const recipeId = $(this).data('recipe-id');
+        console.log('לחיצה על מתכון עם ID:', recipeId);
         const recipe = allRecipes.find(r => r.id === recipeId);
+        console.log('מתכון שנמצא:', recipe ? recipe.name : 'לא נמצא');
         if (recipe) {
             showRecipeModal(recipe);
+        } else {
+            console.error('מתכון לא נמצא עבור ID:', recipeId);
+            showError('שגיאה: המתכון לא נמצא. אנא נסה לרענן את הדף.');
         }
     });
     
@@ -641,9 +752,14 @@ function initializeEventListeners() {
     // לחיצה על "צפה במתכון המלא" במתכון חירום
     $(document).on('click', '.view-full-recipe', function() {
         const recipeId = $(this).data('recipe-id');
+        console.log('לחיצה על צפה במתכון המלא עם ID:', recipeId);
         const recipe = allRecipes.find(r => r.id === recipeId);
+        console.log('מתכון חירום שנמצא:', recipe ? recipe.name : 'לא נמצא');
         if (recipe) {
             showRecipeModal(recipe);
+        } else {
+            console.error('מתכון חירום לא נמצא עבור ID:', recipeId);
+            showError('שגיאה: מתכון החירום לא נמצא. אנא נסה לרענן את הדף.');
         }
     });
 }
@@ -671,7 +787,7 @@ function switchTab(tab) {
 // הצגת מודל מתכון
 function showRecipeModal(recipe) {
     const nutrition = calculateRecipeNutrition(recipe);
-    const nutritionSection = nutrition.coverage > 30 ? `
+    const nutritionSection = nutrition.coverage > 20 ? `
         <div class="modal-nutrition">
             <h4>ערכים תזונתיים (משוערים):</h4>
             <div class="nutrition-summary">
