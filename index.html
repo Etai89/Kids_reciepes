@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מתכונים לארוחת בוקר לילדים</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="shortcut icon" href="logo-192px.png" type="image/x-icon">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <!-- כותרת ראשית -->
+        <header class="main-header">
+            <h1>🍽️ ארוחות בוקר טעימות לילדים 🌟</h1>
+            <p class="subtitle">מתכונים כשרים ובריאים לכל הגילאים</p>
+        </header>
+        <!-- חיפוש -->
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="חפש מתכון או מרכיב...">
+                <button id="search-btn">🔍 חפש</button>
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-season="all">כל השנה</button>
+                <button class="filter-btn" data-season="חורף">❄️ חורף</button>
+                <button class="filter-btn" data-season="קיץ">☀️ קיץ</button>
+            </div>
+
+            <!-- מסנן גילאים -->
+            <div class="age-filter-section">
+                <label for="age-filter">סנן לפי גיל:</label>
+                <select id="age-filter" class="age-filter-select">
+                    <option value="all">כל הגילאים</option>
+                    <option value="1-2">1-2 שנים</option>
+                    <option value="1-3">1-3 שנים</option>
+                    <option value="2-5">2-5 שנים</option>
+                    <option value="3-8">3-8 שנים</option>
+                    <option value="5-12">5-12 שנים</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- תוכן כרטיסיות -->
+
+        <!-- כרטיסיית מתכונים -->
+        <div id="recipes-tab" class="tab-content active">
+            <!-- סטטיסטיקות -->
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="total-recipes">168</span>
+                    <span class="stat-label">מתכונים</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="visible-recipes">168</span>
+                    <span class="stat-label">מוצגים</span>
+                </div>
+            </div>
+
+            <!-- קטגוריות -->
+            <div class="categories-container">
+                <div class="category" data-category="ארוחת_חירום_לגן">
+
+
+                    <!-- כפתור מתכון רנדומלי -->
+                    <div class="emergency-controls" style="margin-top: 15px; text-align: center;">
+                        <button id="randomEmergencyRecipe" class="emergency-btn">
+                            🎲 מתכון חירום רנדומלי
+                        </button>
+                        <div class="navigation-controls" style="margin-top: 10px;">
+                            <button id="prevEmergencyRecipe" class="nav-btn">⬅ הקודם</button>
+                            <span id="currentEmergencyIndex">1 / 30</span>
+                            <button id="nextEmergencyRecipe" class="nav-btn">הבא ➡</button>
+                        </div>
+                        <div id="emergencyRecipeDisplay" class="emergency-recipe-display"></div>
+                    </div>
+
+                    <div class="category-header">
+                        <h2>🚨 ארוחת חירום לגן - מתכונים מהירים</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="recipes-grid" id="ארוחת_חירום_לגן"></div>
+                </div>
+
+                <div class="category" data-category="דגנים_וקטניות">
+                    <div class="category-header">
+                        <h2>🌾 דגנים וקטניות</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="recipes-grid" id="דגנים_וקטניות"></div>
+                </div>
+
+                <div class="category" data-category="ביצים">
+                    <div class="category-header">
+                        <h2>🥚 מנות ביצים</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="recipes-grid" id="ביצים"></div>
+                </div>
+
+                <div class="category" data-category="פירות_ומיצים">
+                    <div class="category-header">
+                        <h2>🍓 פירות ומיצים</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="recipes-grid" id="פירות_ומיצים"></div>
+                </div>
+
+                <div class="category" data-category="לחמים_ומאפים">
+                    <div class="category-header">
+                        <h2>🍞 לחמים ומאפים</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="recipes-grid" id="לחמים_ומאפים"></div>
+                </div>
+
+                <div class="category" data-category="יוגורטים_ומוצרי_חלב">
+                    <div class="category-header">
+                        <h2>🥛 יוגורטים ומוצרי חלב</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="recipes-grid" id="יוגורטים_ומוצרי_חלב"></div>
+                </div>
+
+                <div class="category" data-category="מנות_חמות_חורף">
+                    <div class="category-header">
+                        <h2>🔥 מנות חמות לחורף</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="recipes-grid" id="מנות_חמות_חורף"></div>
+                </div>
+
+                <div class="category" data-category="מנות_קרות_קיץ">
+                    <div class="category-header">
+                        <h2>🧊 מנות קרות לקיץ</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="recipes-grid" id="מנות_קרות_קיץ"></div>
+                </div>
+
+                <div class="category" data-category="מתכונים_מיוחדים">
+                    <div class="category-header">
+                        <h2>⭐ מתכונים מיוחדים</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="recipes-grid" id="מתכונים_מיוחדים"></div>
+                </div>
+
+                <div class="category" data-category="מתכונים_לגילאי_1_3">
+                    <div class="category-header">
+                        <h2>👶 מתכונים לגילאי 1-3</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="recipes-grid" id="מתכונים_לגילאי_1_3"></div>
+                </div>
+
+                <div class="category" data-category="חלבונים_ובניית_שרירים">
+                    <div class="category-header">
+                        <h2>💪 חלבונים ובניית שרירים</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="recipes-grid" id="חלבונים_ובניית_שרירים"></div>
+                </div>
+
+                <div class="category" data-category="פחמימות_מורכבות">
+                    <div class="category-header">
+                        <h2>⚡ פחמימות מורכבות ואנרגיה</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="recipes-grid" id="פחמימות_מורכבות"></div>
+                </div>
+
+                <div class="category" data-category="ויטמינים_ומינרלים">
+                    <div class="category-header">
+                        <h2>🌈 ויטמינים ומינרלים חיוניים</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="recipes-grid" id="ויטמינים_ומינרלים"></div>
+                </div>
+
+                <div class="category" data-category="דגנים_מלאים_ובריאותיים">
+                    <div class="category-header">
+                        <h2>🌾 דגנים מלאים ובריאותיים</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="recipes-grid" id="דגנים_מלאים_ובריאותיים"></div>
+                </div>
+            </div>
+
+            <!-- כרטיסיית ערכים תזונתיים -->
+            <div id="nutrition-tab" class="tab-content">
+                <div class="nutrition-search">
+                    <input type="text" id="nutrition-search-input" placeholder="חפש מרכיב...">
+                    <div class="nutrition-filters">
+                        <button class="nutrition-filter-btn active" data-filter="all">הכל</button>
+                        <button class="nutrition-filter-btn" data-filter="gluten_free">ללא גלוטן</button>
+                        <button class="nutrition-filter-btn" data-filter="low_sugar">סוכר נמוך</button>
+                        <button class="nutrition-filter-btn" data-filter="high_protein">עשיר חלבון</button>
+                    </div>
+                </div>
+
+                <!-- רשימת מרכיבים -->
+                <div class="ingredients-list">
+                    <h3>📋 רשימת מרכיבים במתכונים</h3>
+                    <div class="ingredients-grid" id="ingredients-list"></div>
+                </div>
+
+                <!-- פרטי מרכיב נבחר -->
+                <div class="selected-ingredient" id="selected-ingredient" style="display: none;">
+                    <h3>📊 פרטים תזונתיים</h3>
+                    <div class="ingredient-details" id="ingredient-details"></div>
+                </div>
+
+                <!-- מידע על אלרגנים -->
+                <div class="allergen-info">
+                    <h3>🚨 מידע חשוב על אלרגנים</h3>
+                    <div class="allergen-cards" id="allergen-list"></div>
+                </div>
+            </div>
+
+            <!-- פופאפ מתכון -->
+            <div id="recipe-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <div id="modal-recipe-content"></div>
+                </div>
+            </div>
+
+            <!-- הודעת אין תוצאות -->
+            <div id="no-results" class="no-results" style="display: none;">
+                <h3>😔 לא נמצאו מתכונים</h3>
+                <p>נסה לחפש במילים אחרות או לבדוק קטגוריה אחרת</p>
+            </div>
+
+            <!-- כפתור חזרה לטופ -->
+            <button id="back-to-top" class="back-to-top" style="display: none;">⬆️</button>
+        </div>
+
+        <footer class="footer">
+            <p>המתכונים כשרים ובטוחים לכל המשפחה</p>
+            <p>כל הזכויות שמורות לאיתי חתואל פתרונות דיגיטליים © 2025 | : <a href="https://dev.etai.co.il/"><u
+                        style="color: white;"><strong>dev.etai.co.il</strong></u></a> </p>
+        </footer>
+
+        <script src="script.js"></script>
+</body>
+
+</html>
