@@ -57,7 +57,36 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.2);
     margin-bottom: 30px;
 }
-
+#share-btn{
+    background: linear-gradient(135deg, #4ecdc4, #44a08d, #667eea);
+    background-size: 200% 200%;
+    animation: gradientShift 2.5s ease infinite;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    box-shadow: 0 10px 25px rgba(78, 205, 196, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    margin-top: 15px;
+}
+.share-recipe-btn{
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52, #ff9f43);
+    background-size: 200% 200%;
+    animation: gradientShift 2s ease infinite;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    margin-top: 15px;
+}
 .search-container {
     display: flex;
     gap: 15px;

@@ -20,8 +20,31 @@ $(document).ready(function() {
     showBackToTop();
     $('.emergency-recipe-display').hide();
     $('.category').addClass('collapsed');
+
     console.log('הפעלת האפליקציה הושלמה בהצלחה');
 });
+
+const share_btn = $('#share-btn');
+share_btn.on('click', function() {
+    // שיתוף האפליקצייה
+    if (navigator.share) {
+        navigator.share({
+            title: 'מתכונים לארוחת בוקר לילדים',
+            url: window.location.href
+        }).then(() => {
+            console.log('שיתוף הצליח');
+        }).catch((error) => {
+            console.error('שגיאה בשיתוף:', error);
+        });
+    } else {
+        console.warn('שיתוף לא נתמך בדפדפן זה');
+    }
+});
+
+
+
+
+
 
 // טעינת המתכונים מקובץ JSON
 async function loadRecipes() {
@@ -789,7 +812,7 @@ function showRecipeModal(recipe) {
                 <span>⚡ ${nutrition.carbohydrates}g פחמימות</span>
                 <span>🥑 ${nutrition.fat}g שומן</span>
             </div>
-            <div class="coverage-note">כיסוי מרכיבים: ${nutrition.coverage}%</div>
+            <div class="coverage-note">כיסוי מרכיבים: ${nutrition.coverage}%   <button class="share-recipe-btn">שיתוף מתכון</button></div>
         </div>
     ` : '';
 
@@ -822,7 +845,17 @@ function showRecipeModal(recipe) {
     
     $('#modal-recipe-content').html(modalContent);
     $('#recipe-modal').show();
+    const button2 = $('.share-recipe-btn');
+    button2.click(function() {
+        const shareText = `מתכון: ${recipe.name}\nמצרכים: ${recipe.ingredients.join(', ')}\nהוראות: ${recipe.instructions} \nלפרטים נוספים בקרו באתר המתכונים שלנו!\n${window.location.href}`;
+        navigator.share({ text: shareText }).then(() => {
+        }).catch(err => {
+            console.error('שגיאה בהעתקת המתכון:', err);
+            alert('שגיאה בהעתקת המתכון. אנא נסה שוב.');
+        });
+    });
 }
+
 
 // סגירת מודל
 function closeModal() {
