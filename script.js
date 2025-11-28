@@ -41,8 +41,17 @@ share_btn.on('click', function() {
     }
 });
 
+const send_me_recipes_btn = $('#send_me_recipes_btn');
 
-
+send_me_recipes_btn.on('click', function() {
+    $('.send_recipe_form').html(`
+        <iframe id="create-recipes-iframe" src="createRecipes.html" width="100%" height="500px" frameborder="0"></iframe>
+        <button id="close-iframe" class="close-btn">סגור</button>`)
+    $("#close-iframe").on('click', function() {
+    $("#create-recipes-iframe").hide("slow");
+    $(this).hide();
+});
+});
 
 
 

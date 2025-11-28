@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>יצירת מתכון</title>
+    <!-- Google Hebrew Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <style>
+        body {
+            font-family: 'Heebo', Arial, sans-serif;
+            direction: rtl;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1, h2 {
+            font-family: 'Heebo', Arial, sans-serif;
+            font-weight: 700;
+            color: #2d3a4a;
+            background: linear-gradient(90deg, #f1cc8c 0%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 24px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+            padding: 32px 24px;
+            margin: 0 auto;
+        }
+        #recipes-display, #recipes-count, #send-recipes-btn {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        @media (max-width: 700px) {
+            form {
+                max-width: 98vw;
+                padding: 18px 6px;
+                border-radius: 10px;
+            }
+            h1, h2 {
+                font-size: 1.3em;
+                margin-bottom: 16px;
+            }
+            #recipes-display, #recipes-count, #send-recipes-btn {
+                max-width: 98vw;
+                padding: 0 2vw;
+            }
+            .recipe-card-edit {
+                padding: 12px 6px;
+                border-radius: 10px;
+            }
+            .field-row label {
+                min-width: 90px;
+                font-size: 0.95em;
+            }
+            input, select, textarea {
+                font-size: 15px;
+                padding: 8px;
+            }
+            button, .collapse-btn {
+                font-size: 15px;
+                padding: 8px 12px;
+                min-width: 90px;
+            }
+        }
+        label {
+            margin-top: 10px;
+            font-weight: 700;
+            color: #2d3a4a;
+        }
+        input, select, textarea {
+            margin-top: 5px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            /* background: #f6f7fb; */
+            transition: border 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border: 1.5px solid #6a82fb;
+            outline: none;
+        }
+        button {
+            width: auto;
+            min-width: 120px;
+            align-self: flex-start;
+            margin-top: 20px;
+            padding: 10px 24px;
+            font-size: 16px;
+            font-family: 'Heebo', Arial, sans-serif;
+            font-weight: 700;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(90deg,  #8fe97d 50%);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(106,130,251,0.08);
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            background: linear-gradient(90deg, #80ea6b 80%);
+            box-shadow: 0 4px 16px rgba(252,92,125,0.12);
+        }
+        #send-recipes-btn {
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+            color: #fff;
+            font-weight: 700;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(67,233,123,0.08);
+        }
+        #send-recipes-btn:hover {
+            background: linear-gradient(90deg, #38f9d7 0%, #43e97b 100%);
+        }
+        #recipes-count {
+            font-size: 18px;
+            color: #2d3a4a;
+            margin-bottom: 12px;
+        }
+        .recipe-card-edit {
+            /* background: #fff; */
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.07);
+            padding: 24px 18px;
+            margin-bottom: 18px;
+            position: relative;
+            transition: box-shadow 0.2s;
+        }
+        .recipe-card-edit.collapsed {
+            padding: 12px 18px;
+            min-height: 40px;
+            max-height: 60px;
+            overflow: hidden;
+        }
+        .field-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .field-row label {
+            min-width: 120px;
+            color: #6a82fb;
+        }
+        .edit-field {
+            flex: 1;
+            margin-right: 8px;
+            /* background: #f6f7fb; */
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            padding: 8px;
+        }
+        .recipe-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .collapse-btn {
+            background: linear-gradient(90deg, #f6da4d 50%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 18px;
+            font-size: 15px;
+            font-family: 'Heebo', Arial, sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            margin-left: 8px;
+            margin-bottom: 8px;
+            transition: background 0.2s;
+        }
+        .collapse-btn:hover {
+            background: linear-gradient(90deg, #f6da4d 100%);
+        }
+    </style>
+    <h1>יצירת מתכון חדש</h1>
+    <form id="create-recipe-form">
+        <label for="recipe-category">קטגוריה :</label>
+        <select name="recipe-category" id="recipe-category" required>
+            <option value="דגנים_וקטניות">דגנים וקטניות</option>
+            <option value="ביצים">ביצים</option>
+            <option value="פירות_ומיצים">פירות ומיצים</option>
+            <option value="לחמים_ומאפים">לחמים ומאפים</option>
+            <option value="יוגורטים_ומוצרי_חלב">יוגורטים ומוצרי חלב</option>
+            <option value="מנות_חמות_חורף">מנות חמות חורף</option>
+            <option value="מנות_קרות_קיץ">מנות קרות קיץ</option>
+            <option value="מתכונים_מיוחדים">מתכונים מיוחדים</option>
+            <option value="חלבונים_ובניית_שרירים">חלבונים ובניית שרירים</option>
+            <option value="פחמימות_מורכבות">פחמימות מורכבות</option>
+            <option value="ויטמינים_ומינרלים">ויטמינים ומינרלים</option>
+            <option value="דגנים_מלאים_ובריאותיים">דגנים מלאים ובריאותיים</option>
+            <option value="ארוחת_חירום_לגן">ארוחת חירום לגן</option>
+            <option value="מתכונים_לגילאי_1_3">מתכונים לגילאי 1-3</option>
+        </select>
+
+        <label for="recipe-season">לאיזה עונה זה מתאים:</label>
+        <select name="recipe-season" id="recipe-season" required>
+            <option value="all">כל העונות</option>
+            <option value="winter">חורף</option>
+            <option value="spring">אביב</option>
+            <option value="summer">קיץ</option>
+            <option value="autumn">סתיו</option>
+        </select>
+        <label for="recipe-age-group">מתאים לגילאי:</label>
+        <select name="recipe-age-group" id="recipe-age-group" required>
+            <option value="all">כל הגילאים</option>
+            <option value="kids">1-2</option>
+            <option value="teens">1-3</option>
+            <option value="adults">2-5</option>
+            <option value="seniors">3-8</option>
+            <option value="elders">5-12</option>
+
+        </select>
+        <label for="recipe-name">שם המתכון:</label>
+        <input type="text" id="recipe-name" name="recipe-name" required>
+
+        <label for="recipe-prep-time">זמן הכנה:</label>
+        <input type="text" id="recipe-prep-time" name="recipe-prep-time" required>
+
+        <label for="recipe-ingredients">מצרכים:</label>
+        <p>דוגמאות: כוס חלב, 2 ביצים, 100 גרם גבינה לבנה</p>
+        <!-- <input type="text" id="recipe-ingredients" name="recipe-ingredients" required> -->
+        <button type="button" id="add-ingredient-btn">הוסף מצרך נוסף</button>
+        <div id="additional-ingredients"></div>
+        <label for="recipe-instructions">הוראות הכנה:</label>
+        <textarea id="recipe-instructions" name="recipe-instructions" required></textarea>
+
+        <button type="submit">שמור מתכון</button>
+    </form>
+    <div id="recipes-display" style="margin-top:40px;"></div>
+    <div id="recipes-count" style="margin-top:20px; font-weight:bold;"></div>
+    <button id="send-recipes-btn" style="margin-bottom:20px; background:#3498db; color:#fff; padding:10px 20px; border:none; border-radius:6px; cursor:pointer;">שלחו את כל המתכונים</button>
+    <script>
+        // Utility: Render all recipes from localStorage
+        function renderRecipes() {
+            const container = document.getElementById('recipes-display');
+            const countDiv = document.getElementById('recipes-count');
+            let recipesArr = [];
+            try {
+                const stored = localStorage.getItem('recipes');
+                if (stored) recipesArr = JSON.parse(stored);
+            } catch(e) { recipesArr = []; }
+
+            // Show count
+            countDiv.textContent = `כמות מתכונים: ${recipesArr.length}`;
+
+            if (!recipesArr.length) {
+                container.innerHTML = '<p>אין מתכונים להצגה.</p>';
+                return;
+            }
+
+            container.innerHTML = '<h2>רשימת מתכונים</h2>';
+            recipesArr.forEach((recipe, idx) => {
+                // Build recipe card
+                const card = document.createElement('div');
+                card.className = 'recipe-card-edit';
+
+                // Collapse button
+                const collapseBtn = document.createElement('button');
+                collapseBtn.className = 'collapse-btn';
+                collapseBtn.textContent = 'צמצם';
+                collapseBtn.onclick = function() {
+                    if (card.classList.contains('collapsed')) {
+                        card.classList.remove('collapsed');
+                        collapseBtn.textContent = 'צמצם';
+                        // Show all field rows
+                        card.querySelectorAll('.field-row').forEach(row => row.style.display = 'flex');
+                        card.querySelector('.recipe-actions').style.display = 'flex';
+                    } else {
+                        card.classList.add('collapsed');
+                        collapseBtn.textContent = 'הרחב';
+                        // Hide all field rows except name
+                        card.querySelectorAll('.field-row').forEach((row, i) => {
+                            row.style.display = i === 0 ? 'flex' : 'none';
+                        });
+                        card.querySelector('.recipe-actions').style.display = 'none';
+                    }
+                };
+                card.appendChild(collapseBtn);
+
+                // Editable fields
+                const fields = [
+                    {key:'name',label:'שם מתכון'},
+                    {key:'ingredients',label:'מצרכים'},
+                    {key:'instructions',label:'הוראות הכנה'},
+                    {key:'age_range',label:'גילאים'},
+                    {key:'season',label:'עונה'},
+                    {key:'prep_time',label:'זמן הכנה'},
+                    {key:'difficulty',label:'רמת קושי'}
+                ];
+
+                let isEdit = false;
+
+                // Create field elements
+                fields.forEach(field => {
+                    const fieldDiv = document.createElement('div');
+                    fieldDiv.className = 'field-row';
+                    const label = document.createElement('label');
+                    label.textContent = field.label + ': ';
+
+                    let valueEl;
+                    if (field.key === 'ingredients') {
+                        valueEl = document.createElement('textarea');
+                        valueEl.value = Array.isArray(recipe.ingredients) ? recipe.ingredients.join(', ') : recipe.ingredients;
+                        valueEl.rows = 2;
+                    } else if (field.key === 'instructions') {
+                        valueEl = document.createElement('textarea');
+                        valueEl.value = recipe.instructions;
+                        valueEl.rows = 2;
+                    } else {
+                        valueEl = document.createElement('input');
+                        valueEl.type = 'text';
+                        valueEl.value = recipe[field.key] || '';
+                    }
+                    valueEl.disabled = true;
+                    valueEl.className = 'edit-field';
+                    fieldDiv.appendChild(label);
+                    fieldDiv.appendChild(valueEl);
+                    card.appendChild(fieldDiv);
+                });
+
+                // Actions (edit/delete)
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'recipe-actions';
+
+                // Edit button
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'ערוך';
+                editBtn.onclick = function() {
+                    const fields = card.querySelectorAll('.edit-field');
+                    if (editBtn.textContent === 'ערוך') {
+                        fields.forEach(f => f.disabled = false);
+                        editBtn.textContent = 'שמור';
+                    } else {
+                        // Save changes
+                        const updated = {};
+                        let i = 0;
+                        fields.forEach(f => {
+                            const key = ['name','ingredients','instructions','age_range','season','prep_time','difficulty'][i];
+                            if (key === 'ingredients') {
+                                updated[key] = f.value.split(',').map(s => s.trim()).filter(Boolean);
+                            } else {
+                                updated[key] = f.value;
+                            }
+                            i++;
+                        });
+                        // Update recipe
+                        recipesArr[idx] = {...recipe, ...updated};
+                        localStorage.setItem('recipes', JSON.stringify(recipesArr));
+                        renderRecipes();
+                    }
+                };
+                actionsDiv.appendChild(editBtn);
+
+                // Delete button
+                const delBtn = document.createElement('button');
+                delBtn.textContent = 'מחק';
+                delBtn.style.background = 'linear-gradient(90deg, #e74c3c 0%, #fc5c7d 100%)';
+                delBtn.style.color = '#fff';
+                delBtn.onclick = function() {
+                    if (confirm('האם למחוק את המתכון?')) {
+                        recipesArr.splice(idx,1);
+                        localStorage.setItem('recipes', JSON.stringify(recipesArr));
+                        renderRecipes();
+                    }
+                };
+                actionsDiv.appendChild(delBtn);
+
+                card.appendChild(actionsDiv);
+                container.appendChild(card);
+            });
+        }
+        // Send recipes via email
+        document.getElementById('send-recipes-btn').addEventListener('click', function() {
+            let recipesArr = [];
+            try {
+                const stored = localStorage.getItem('recipes');
+                if (stored) recipesArr = JSON.parse(stored);
+            } catch(e) { recipesArr = []; }
+            if (!recipesArr.length) {
+                alert('אין מתכונים לשליחה');
+                return;
+            }
+            // Format date/time for subject
+            const now = new Date();
+            const pad = n => n < 10 ? '0'+n : n;
+            const subject = `מתכונים חדשים - ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+            const body = JSON.stringify(recipesArr, null, 2);
+            // Gmail compose URL
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=senioretai@gmail.com&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(gmailUrl, '_blank');
+        });
+        document.getElementById('add-ingredient-btn').addEventListener('click', function() {
+            const additionalIngredientsDiv = document.getElementById('additional-ingredients');
+            const wrapper = document.createElement('div');
+            wrapper.style.display = 'flex';
+            wrapper.style.alignItems = 'center';
+            wrapper.style.gap = '8px';
+
+            const newIngredientInput = document.createElement('input');
+            newIngredientInput.type = 'text';
+            newIngredientInput.name = 'recipe-ingredients';
+            newIngredientInput.required = true;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.textContent = 'הסר';
+            removeBtn.style.marginLeft = '4px';
+            removeBtn.onclick = function() {
+                wrapper.remove();
+            };
+
+            wrapper.appendChild(newIngredientInput);
+            wrapper.appendChild(removeBtn);
+            additionalIngredientsDiv.appendChild(wrapper);
+        });
+
+        document.getElementById('create-recipe-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Collect form values
+            const name = document.getElementById('recipe-name').value;
+            const ingredientsInputs = document.getElementsByName('recipe-ingredients');
+            const ingredients = Array.from(ingredientsInputs).map(input => input.value).filter(v => v.trim() !== '');
+            const instructions = document.getElementById('recipe-instructions').value;
+            const age_range = document.getElementById('recipe-age-group').selectedOptions[0].text;
+            let season = document.getElementById('recipe-season').value;
+            const prep_time = document.getElementById('recipe-prep-time').value;
+            const difficulty = 'קל'; // אפשר להוסיף שדה בעתיד
+
+            // Normalize season value to Hebrew
+            const seasonMap = {
+                'all': 'כל השנה',
+                'winter': 'חורף',
+                'spring': 'אביב',
+                'summer': 'קיץ',
+                'autumn': 'סתיו'
+            };
+            if (seasonMap[season]) season = seasonMap[season];
+
+            // Get recipes from localStorage
+            let recipesArr = [];
+            try {
+                const stored = localStorage.getItem('recipes');
+                if (stored) {
+                    recipesArr = JSON.parse(stored);
+                }
+            } catch (e) {
+                recipesArr = [];
+            }
+
+            // Generate unique ID
+            let nextId = 1;
+            if (recipesArr.length > 0) {
+                nextId = Math.max(...recipesArr.map(r => r.id || 0)) + 1;
+            }
+
+            // Build recipe object
+            const recipe = {
+                id: nextId,
+                name,
+                ingredients,
+                instructions,
+                age_range,
+                season,
+                prep_time,
+                difficulty
+            };
+
+            // Add to array and save
+            recipesArr.push(recipe);
+            localStorage.setItem('recipes', JSON.stringify(recipesArr));
+
+            console.log('מתכון חדש נוצר:', recipe);
+            alert('המתכון נשמר בהצלחה!');
+            this.reset();
+            document.getElementById('additional-ingredients').innerHTML = '';
+            renderRecipes();
+        });
+    // Initial render on page load
+    renderRecipes();
+    </script>
+</body>
+</html>
